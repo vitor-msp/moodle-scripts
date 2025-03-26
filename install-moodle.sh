@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # check env vars
-for var in MOODLE_DATA_EFS_HOSTNAME MOODLE_CODE_EFS_HOSTNAME MOODLE_DOMAIN; do
+for var in MOODLE_DATA_EFS_HOSTNAME MOODLE_CODE_EFS_HOSTNAME MOODLE_URL; do
     if [ -z "${!var}" ]; then
         echo "Environment variable $var is not set."
         exit 1
@@ -66,8 +66,8 @@ if [ ! -f /var/www/html/config.php ]; then
     git clone -b MOODLE_405_STABLE git://git.moodle.org/moodle.git /var/www/html/
     chown -R root:root /var/www/html
     chmod -R 0755 /var/www/html
-    chown -R www-data:www-data /var/www/moodledata
     chown www-data /var/www/html
+    chown -R www-data:www-data /var/www/moodledata
 fi
 
 # install cloudwatch agent
@@ -80,7 +80,7 @@ cp $ROOT_FOLDER/cloudwatch-agent.json /var/www/cloudwatch-agent.json
 # configure initialization script
 cp $ROOT_FOLDER/moodle-initialization.sh /var/www/initialization.sh
 chmod 770 /var/www/initialization.sh
-echo "@reboot MOODLE_DOMAIN=\"$MOODLE_DOMAIN\" /var/www/initialization.sh >> /dev/null 2>&1" | crontab -
+echo "@reboot MOODLE_URL=\"$MOODLE_URL\" /var/www/initialization.sh >> /dev/null 2>&1" | crontab -
 
 echo Moodle installation completed
 

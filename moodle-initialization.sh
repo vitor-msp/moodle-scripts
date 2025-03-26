@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # check env vars
-if [ -z "$MOODLE_DOMAIN" ]; then
-    echo "Environment variable MOODLE_DOMAIN is not set."
+if [ -z "$MOODLE_URL" ]; then
+    echo "Environment variable MOODLE_URL is not set."
     exit 1
 fi
 
@@ -12,7 +12,7 @@ INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.2
 envsubst '${INSTANCE_ID}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 # set moodle domain
-sed -i "s|\$CFG->wwwroot.*|\$CFG->wwwroot   = '$MOODLE_DOMAIN';|" /var/www/html/config.php
+sed -i "s|\$CFG->wwwroot.*|\$CFG->wwwroot   = '$MOODLE_URL';|" /var/www/html/config.php
 
 # restart nginx
 systemctl restart nginx
