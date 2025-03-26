@@ -8,6 +8,9 @@ for var in MOODLE_DATA_EFS_HOSTNAME MOODLE_CODE_EFS_HOSTNAME MOODLE_DOMAIN; do
     fi
 done
 
+# save current directory
+ROOT_FOLDER=$(pwd)
+
 # set timezone
 timedatectl set-timezone America/Sao_Paulo
 
@@ -40,8 +43,8 @@ openssl x509 -req -in moodle.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out m
 chmod 644 moodle.crt moodle.key
 
 # configure nginx
-cp ./nginx.conf /etc/nginx/nginx.conf.template
-cp ./moodle.conf /etc/nginx/sites-available/moodle.conf
+cp $ROOT_FOLDER/nginx.conf /etc/nginx/nginx.conf.template
+cp $ROOT_FOLDER/moodle.conf /etc/nginx/sites-available/moodle.conf
 ln -sf /etc/nginx/sites-available/moodle.conf /etc/nginx/sites-enabled/moodle 
 rm /etc/nginx/sites-enabled/default
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
@@ -71,11 +74,11 @@ fi
 curl https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb -o /tmp/amazon-cloudwatch-agent.deb
 apt install -y /tmp/amazon-cloudwatch-agent.deb
 systemctl enable amazon-cloudwatch-agent
-cp ./cloudwatch-agent.json /var/www/cloudwatch-agent.json
+cp $ROOT_FOLDER/cloudwatch-agent.json /var/www/cloudwatch-agent.json
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/var/www/cloudwatch-agent.json
 
 # configure initialization script
-cp ./moodle-initialization.sh /var/www/initialization.sh
+cp $ROOT_FOLDER/moodle-initialization.sh /var/www/initialization.sh
 chmod 770 /var/www/initialization.sh
 echo "@reboot MOODLE_DOMAIN=\"$MOODLE_DOMAIN\" /var/www/initialization.sh >> /dev/null 2>&1" | crontab -
 
