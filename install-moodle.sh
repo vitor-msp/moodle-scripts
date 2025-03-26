@@ -48,7 +48,7 @@ cp $ROOT_FOLDER/moodle.conf /etc/nginx/sites-available/moodle.conf
 ln -sf /etc/nginx/sites-available/moodle.conf /etc/nginx/sites-enabled/moodle 
 rm /etc/nginx/sites-enabled/default
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
-INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+export INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
 envsubst '${INSTANCE_ID}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 systemctl enable nginx
 systemctl restart nginx
