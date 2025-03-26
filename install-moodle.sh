@@ -82,4 +82,6 @@ cp $ROOT_FOLDER/moodle-initialization.sh /var/www/initialization.sh
 chmod 770 /var/www/initialization.sh
 echo "@reboot MOODLE_DOMAIN=\"$MOODLE_DOMAIN\" /var/www/initialization.sh >> /dev/null 2>&1" | crontab -
 
+echo Moodle installation completed
+
 exit 0
