@@ -12,6 +12,6 @@ curl https://moodle.org/plugins/download.php/33918/tool_heartbeat_moodle44_20241
 unzip -q /tmp/heartbeat.zip -d /var/www/html/admin/tool
 chown -R root:root /var/www/html/admin/tool/heartbeat
 chmod -R 0755 /var/www/html/admin/tool/heartbeat
-echo Access YOUR_MOODLE_DOMAIN/admin/settings.php?section=tool_heartbeat to configure hearbeat
+echo Access YOUR_MOODLE_URL/admin/settings.php?section=tool_heartbeat to configure hearbeat
 
 exit 0
