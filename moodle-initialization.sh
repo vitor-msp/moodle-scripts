@@ -1,23 +1,56 @@
 #!/bin/bash
 
-# check env vars
-if [ -z "$MOODLE_URL" ]; then
-    echo "Environment variable MOODLE_URL is not set."
-    exit 1
-fi
+STATUS_FILE=/var/www/html/ec2-launch-status.php
 
-# convert moodle url to lower case
-MOODLE_URL=${MOODLE_URL,,}
+init_log(){
+    echo "<?php" > $STATUS_FILE
+}
 
-# set instance id env var for nginx
-TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
-export INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
-envsubst '${INSTANCE_ID}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+log(){
+    MESSAGE=$1
+    echo "echo '$MESSAGE <br>';" >> $STATUS_FILE
+}
 
-# set moodle domain
-sed -i "s|\$CFG->wwwroot.*|\$CFG->wwwroot   = '$MOODLE_URL';|" /var/www/html/config.php
+log_bold(){
+    MESSAGE=$1
+    log "<strong>$MESSAGE</strong>"
+}
 
-# restart nginx
-systemctl restart nginx
+check_env_vars(){
+    if [ -z "$MOODLE_URL" ]; then
+        log_bold "Error in Moodle initialization script: environment variable MOODLE_URL is not set"
+        exit 1
+    fi
+}
 
-exit 0
+configure_nginx(){
+    TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+    export INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+    envsubst '${INSTANCE_ID}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+}
+
+set_moodle_domain(){
+    MOODLE_URL=${MOODLE_URL,,}
+    sed -i "s|\$CFG->wwwroot.*|\$CFG->wwwroot   = '$MOODLE_URL';|" /var/www/html/config.php
+}
+
+restart_nginx(){
+    systemctl restart nginx
+}
+
+main(){
+    init_log
+    log_bold "Moodle initialization script started"
+    log "checking env vars"
+    check_env_vars
+    log "configuring nginx"
+    configure_nginx
+    log "setting moodle domain"
+    set_moodle_domain
+    log "restarting nginx"
+    restart_nginx
+    log_bold "Moodle initialization script completed"
+    exit 0
+}
+
+main
