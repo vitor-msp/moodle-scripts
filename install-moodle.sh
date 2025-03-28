@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ROOT_FOLDER=$(pwd)
-STATUS_FILE=/var/www/html/ec2-launch-status.php
+STATUS_FILE=/tmp/ec2-launch-status.php
 
 init_log(){
     rm -f $STATUS_FILE
@@ -16,6 +16,11 @@ log(){
 log_bold(){
     MESSAGE=$1
     log "<strong>$MESSAGE</strong>"
+}
+
+move_log_to_web(){
+    mv $STATUS_FILE /var/www/html/
+    STATUS_FILE=/var/www/html/ec2-launch-status.php
 }
 
 check_env_vars(){
@@ -83,10 +88,8 @@ configure_efs(){
 }
 
 configure_moodle(){
-    mv $STATUS_FILE /tmp/
     rm /var/www/html/*
     git clone -b MOODLE_405_STABLE git://git.moodle.org/moodle.git /var/www/html/
-    mv /tmp/ec2-launch-status.php /var/www/html/
     chown -R root:root /var/www/html
     chmod -R 0755 /var/www/html
     chown www-data /var/www/html
@@ -122,6 +125,7 @@ main(){
     generate_tls_certificate
     log "configuring nginx"
     configure_nginx
+    move_log_to_web
     log "configuring efs"
     configure_efs
     if [ ! -d /var/www/html/.git ]; then
