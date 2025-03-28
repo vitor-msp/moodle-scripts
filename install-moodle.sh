@@ -83,7 +83,7 @@ configure_efs(){
 }
 
 configure_moodle(){
-    mv /var/www/html/ec2-launch-status.php /tmp/
+    mv $STATUS_FILE /tmp/
     rm /var/www/html/*
     git clone -b MOODLE_405_STABLE git://git.moodle.org/moodle.git /var/www/html/
     mv /tmp/ec2-launch-status.php /var/www/html/
