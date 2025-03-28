@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ROOT_FOLDER=$(pwd)
-LOG_FILE=/tmp/ec2-launch-status.php
+LOG_FILE=/tmp/moodle-installation.log
 
 log(){
     MESSAGE=$1
