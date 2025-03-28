@@ -4,6 +4,7 @@ ROOT_FOLDER=$(pwd)
 STATUS_FILE=/var/www/html/ec2-launch-status.php
 
 init_log(){
+    rm $STATUS_FILE
     echo "<?php" > $STATUS_FILE
 }
 
