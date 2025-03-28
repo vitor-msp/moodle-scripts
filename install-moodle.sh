@@ -124,7 +124,7 @@ main(){
     configure_nginx
     log "configuring efs"
     configure_efs
-    if [ ! -f /var/www/html/config.php ]; then
+    if [ ! -d /var/www/html/.git ]; then
         log "configuring moodle"
         configure_moodle
     fi
