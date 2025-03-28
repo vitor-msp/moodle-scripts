@@ -1,26 +1,16 @@
 #!/bin/bash
 
 ROOT_FOLDER=$(pwd)
-STATUS_FILE=/tmp/ec2-launch-status.php
-
-init_log(){
-    rm -f $STATUS_FILE
-    echo "<?php" > $STATUS_FILE
-}
+LOG_FILE=/tmp/ec2-launch-status.php
 
 log(){
     MESSAGE=$1
-    echo "echo '$MESSAGE <br>';" >> $STATUS_FILE
+    echo $MESSAGE >> $LOG_FILE
 }
 
 log_bold(){
     MESSAGE=$1
-    log "<strong>$MESSAGE</strong>"
-}
-
-move_log_to_web(){
-    mv $STATUS_FILE /var/www/html/
-    STATUS_FILE=/var/www/html/ec2-launch-status.php
+    log "### $MESSAGE ###"
 }
 
 check_env_vars(){
@@ -111,7 +101,6 @@ configure_initialization_script(){
 }
 
 main(){
-    init_log
     log_bold "Moodle installation started"
     log "checking env vars"
     check_env_vars
@@ -125,7 +114,6 @@ main(){
     generate_tls_certificate
     log "configuring nginx"
     configure_nginx
-    move_log_to_web
     log "configuring efs"
     configure_efs
     if [ ! -d /var/www/html/.git ]; then
